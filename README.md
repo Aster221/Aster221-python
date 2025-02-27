@@ -8,9 +8,9 @@ Data annotation: Work with the manual review team to annotate illegal content (s
   <img src="./source/N1.png" alt="data set"  />
 </div>
 
-
 Table1：data set
 A public malicious comment dataset was downloaded from the Kaggle official website, totaling about 160,000 data points for training.
+
 1.2 Data preprocessing
 Text cleaning: remove irrelevant characters, HTML tags, URLs, emoticons, etc.
 Word segmentation: perform word segmentation on the text, especially for languages ​​such as Chinese, use appropriate word segmentation tools.
@@ -33,8 +33,13 @@ Training set and test set division: divide the labeled data set into training se
 Hyperparameter tuning: use cross-validation and other methods to optimize the model's hyperparameters (such as learning rate, batch size, etc.).
 Model evaluation: use accuracy, recall, F1-score and other indicators to evaluate model performance.
 
+<div align="center">
+  <img src="./source/N2.png" alt="data set"  />
+</div>
 
-
+<div align="center">
+  <img src="./source/N3.png" alt="data set"  />
+</div>
 
 
 
@@ -67,5 +72,8 @@ Recall: 0.96
 F1-score: 0.95
 The weighted average takes into account the amount of support for each class, indicating that the model performs very strongly overall.
 
+<div align="center">
+  <img src="./source/N4.png" alt="data set"  />
+</div>
 
 The ROC curve is close to the upper left corner, and AUC = 0.96, which is an excellent model that can distinguish positive and negative samples well.
