@@ -2,6 +2,7 @@ Using natural language processing, using machine learning models (such as logist
 1. Solution architecture
    
 1.1 Data collection
+
 Data source: 
 
 Use public datasets on the Internet or collect user-generated content from social platforms (such as Twitter, Facebook, Weibo, etc.), including posts, comments, private messages, etc.
