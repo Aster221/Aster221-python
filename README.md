@@ -118,3 +118,7 @@ The weighted average takes into account the amount of support for each class, in
 </div>
 
 The ROC curve is close to the upper left corner, and AUC = 0.96, which is an excellent model that can distinguish positive and negative samples well.
+
+<div align="center">
+  <img src="./source/N5.jpg" alt="data set"  />
+</div>
