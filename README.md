@@ -11,8 +11,11 @@ Data annotation: Work with the manual review team to annotate illegal content (s
   <img src="./source/N1.png" alt="data set"  />
 </div>
 
+<div align="center">
 Table1：data set
+   
 A public malicious comment dataset was downloaded from the Kaggle official website, totaling about 160,000 data points for training.
+</div>
 
 1.2 Data preprocessing
 
@@ -109,6 +112,9 @@ The weighted average takes into account the amount of support for each class, in
 
 <div align="center">
   <img src="./source/N4.png" alt="data set"  />
+</div>
+<div align="center">
+  ROC curve
 </div>
 
 The ROC curve is close to the upper left corner, and AUC = 0.96, which is an excellent model that can distinguish positive and negative samples well.
