@@ -1,0 +1,168 @@
+!pip install pandas scikit-learn
+
+import pandas as pd
+import re
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, accuracy_score
+from google.colab import files
+from nltk.corpus import stopwords
+import nltk
+from gensim.models import Word2Vec
+import numpy as np
+
+from google.colab import drive
+drive.mount('/content/drive')
+
+
+file_path = '/content/drive/MyDrive/Colab Notebooks/train.csv'        # 加载数据集
+df = pd.read_csv(file_path)
+
+print(df.head())        # 4查看数据集的前几行
+
+
+data = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/train.csv')  # 加载数据
+
+print(data['toxic'].value_counts(normalize=True))            # 查看有毒言论的比例
+
+
+
+nltk.download('stopwords')          # 下载停用词数据集
+
+
+data.drop_duplicates(subset='comment_text', inplace=True)      # 去除重复和空值
+data.dropna(subset=['comment_text'], inplace=True)
+
+
+def clean_text(text):                                      # 文本清洗
+    text = text.lower()                                  # 小写化
+    text = re.sub(r'[^\w\s]', '', text)                # 去除标点符号
+    text = re.sub(r'\d+', '', text)                  # 去除数字
+    return text
+
+                                                                    # 应用文本清洗
+data['cleaned_text'] = data['comment_text'].apply(clean_text)
+
+                                                                      # 去除停用词
+stop_words = set(stopwords.words('english'))
+data['cleaned_text'] = data['cleaned_text'].apply(lambda x: ' '.join([word for word in x.split() if word not in stop_words]))
+
+                                                                        # 将清洗后的文本分词
+data['tokenized_text'] = data['cleaned_text'].apply(lambda x: x.split())
+
+                                                                                              # 训练Word2Vec模型
+model = Word2Vec(sentences=data['tokenized_text'], vector_size=100, window=5, min_count=1, workers=4)
+
+                                                                                                # 获取某个词的词向量
+word_vector = model.wv['like']                                              # 替换为你感兴趣的词
+print(word_vector)
+
+                                                                          # 获取整个文本的词向量表示
+def get_text_vector(tokens):
+                                                                          # 过滤掉不在词汇表中的词
+    valid_tokens = [tok for tok in tokens if tok in model.wv]
+
+                                                                                      # 如果有效的词列表为空，返回 None 或者一个零向量
+    if not valid_tokens:
+        return np.zeros(model.vector_size)  # 或者返回 np.zeros(model.vector_size) 以返回零向量
+
+                                                                                # 计算有效词的词向量的平均值
+    return sum(model.wv[tok] for tok in valid_tokens) / len(valid_tokens)
+
+                                                                                # 应用函数计算文本向量
+data['text_vector'] = data['tokenized_text'].apply(get_text_vector)
+
+                                                                                  # 查看结果
+print(data[['comment_text', 'cleaned_text', 'text_vector']].head())
+
+
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+
+X = data['cleaned_text']
+y = data['toxic']
+
+#
+test_size = 0.2
+
+X_train, X_test, y_train, y_test = train_test_split(X, y,
+test_size=test_size, random_state=42, stratify=y)
+
+# TF-IDF
+vectorizer = TfidfVectorizer(max_features=5000)
+X_train_tfidf = vectorizer.fit_transform(X_train)
+X_test_tfidf = vectorizer.transform(X_test)
+
+print("训练集类别分布：")
+print(y_train.value_counts())
+print("\n测试集类别分布：")
+print(y_test.value_counts())
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report,confusion_matrix, roc_curve, auc
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train_tfidf, y_train)
+y_pred = model.predict(X_test_tfidf)
+print(classification_report(y_test, y_pred))
+
+# 计算混淆矩阵
+conf_matrix = confusion_matrix(y_test, y_pred)
+
+# 绘制混淆矩阵
+plt.figure(figsize=(8, 6))
+plt.imshow(conf_matrix, interpolation='nearest', cmap=plt.cm.Blues)
+plt.title('Confusion Matrix')
+plt.colorbar()
+tick_marks = np.arange(2)
+plt.xticks(tick_marks, ['Non-toxic', 'toxic'])
+plt.yticks(tick_marks, ['Non-toxic', 'toxic'])
+
+# 在每个单元格中显示数字
+thresh = conf_matrix.max() / 2.
+for i, j in np.ndindex(conf_matrix.shape):
+    plt.text(j, i, format(conf_matrix[i, j], 'd'),
+             horizontalalignment="center",
+             color="white" if conf_matrix[i, j] > thresh else "black")
+
+plt.ylabel('True label')
+plt.xlabel('Predicted Label')
+plt.tight_layout()
+plt.show()
+
+
+
+# 计算 ROC 曲线
+y_scores = model.predict_proba(X_test_tfidf)[:, 1]  # 预测为正类的概率
+fpr, tpr, _ = roc_curve(y_test, y_scores)
+roc_auc = auc(fpr, tpr)
+
+# 绘制 ROC 曲线
+plt.figure(figsize=(8, 6))
+plt.plot(fpr, tpr, color='blue', lw=2, label='ROC (AUC = {:.2f})'.format(roc_auc))
+plt.plot([0, 1], [0, 1], color='red', lw=2, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver operating characteristic curve')
+plt.legend(loc="lower right")
+plt.show()
+
+
+def predict(text):
+    cleaned_text = clean_text(text)
+    vectorized_text = vectorizer.transform([cleaned_text])
+    prediction = model.predict(vectorized_text)
+    return "Toxic" if prediction[0] == 1 else "Non_Toxic"
+
+# 测试实时预测
+print(predict("Stupid peace of shit stop deleting my stuff asshole go die and fall in a hole go to hell!"))  # 预测为有毒
+print(predict("What a great day!"))     # 预测为无毒
