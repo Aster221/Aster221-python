@@ -4,8 +4,10 @@ Using natural language processing, using machine learning models (such as logist
 Data source: Use public datasets on the Internet or collect user-generated content from social platforms (such as Twitter, Facebook, Weibo, etc.), including posts, comments, private messages, etc.
 Data annotation: Work with the manual review team to annotate illegal content (such as hate speech, harassment, false information, etc.) and compliant content in the dataset to establish a training dataset.
 
+<div align="center">
+  <img src="./source/N1.png" alt="data set"  />
+</div>
 
-![Example Image1](./source/N1.png)
 
 Table1：data set
 A public malicious comment dataset was downloaded from the Kaggle official website, totaling about 160,000 data points for training.
